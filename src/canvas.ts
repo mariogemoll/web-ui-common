@@ -1,6 +1,8 @@
 import type { Margins, Pair, Scale } from './types';
 import { mapRange } from './util';
 
+export const defaultMargins: Margins = { top: 10, right: 40, bottom: 40, left: 40 };
+
 export function getContext(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
   const ctx = canvas.getContext('2d');
   if (!ctx) {
