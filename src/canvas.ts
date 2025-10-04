@@ -1,6 +1,12 @@
 import type { Margins, Pair, Scale } from './types';
 import { mapRange } from './util';
 
+export interface DrawFunction1DOptions {
+  stroke?: string;
+  lineWidth?: number;
+  sampleCount?: number;
+}
+
 export function getContext(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
   const ctx = canvas.getContext('2d');
   if (!ctx) {
@@ -261,4 +267,66 @@ export function writePixelValues(
       }
     }
   }
+}
+
+export function drawFunction1D(
+  ctx: CanvasRenderingContext2D,
+  xScale: Scale,
+  yScale: Scale,
+  fn: (x: number) => number,
+  options: DrawFunction1DOptions = {}
+): void {
+  const {
+    stroke = 'steelblue',
+    lineWidth = 1.5,
+    sampleCount = Math.max(2, Math.floor(Math.abs(xScale.range[1] - xScale.range[0])))
+  } = options;
+
+  if (sampleCount < 2) {
+    return;
+  }
+
+  const [domainStart, domainEnd] = xScale.domain;
+  const totalRange = domainEnd - domainStart;
+
+  ctx.strokeStyle = stroke;
+  ctx.lineWidth = lineWidth;
+
+  let drawing = false;
+
+  const finalizeSegment = (): void => {
+    if (drawing) {
+      ctx.stroke();
+      drawing = false;
+    }
+  };
+
+  for (let i = 0; i < sampleCount; i++) {
+    const t = i / (sampleCount - 1);
+    const xValue = domainStart + t * totalRange;
+    const yValue = fn(xValue);
+
+    if (!Number.isFinite(yValue)) {
+      finalizeSegment();
+      continue;
+    }
+
+    const canvasX = xScale(xValue);
+    const canvasY = yScale(yValue);
+
+    if (!Number.isFinite(canvasX) || !Number.isFinite(canvasY)) {
+      finalizeSegment();
+      continue;
+    }
+
+    if (!drawing) {
+      ctx.beginPath();
+      ctx.moveTo(canvasX, canvasY);
+      drawing = true;
+    } else {
+      ctx.lineTo(canvasX, canvasY);
+    }
+  }
+
+  finalizeSegment();
 }
