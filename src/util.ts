@@ -35,6 +35,7 @@ export function makeScale(domain: Pair<number>, range: Pair<number>): Scale {
   const fnc = mapRange.bind(null, domain, range) as Scale;
   fnc.domain = domain;
   fnc.range = range;
+  fnc.inverse = mapRange.bind(null, range, domain);
   return fnc;
 }
 
