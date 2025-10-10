@@ -7,6 +7,7 @@ export interface DrawFunction1DOptions {
   stroke?: string;
   lineWidth?: number;
   sampleCount?: number;
+  fill?: string;
 }
 
 export function getContext(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
@@ -281,7 +282,8 @@ export function drawFunction1D(
   const {
     stroke = 'steelblue',
     lineWidth = 1.5,
-    sampleCount = Math.max(2, Math.floor(Math.abs(xScale.range[1] - xScale.range[0])))
+    sampleCount = Math.max(2, Math.floor(Math.abs(xScale.range[1] - xScale.range[0]))),
+    fill
   } = options;
 
   if (sampleCount < 2) {
@@ -294,14 +296,8 @@ export function drawFunction1D(
   ctx.strokeStyle = stroke;
   ctx.lineWidth = lineWidth;
 
-  let drawing = false;
-
-  const finalizeSegment = (): void => {
-    if (drawing) {
-      ctx.stroke();
-      drawing = false;
-    }
-  };
+  // Collect all points first
+  const points: Array<{ x: number; y: number }> = [];
 
   for (let i = 0; i < sampleCount; i++) {
     const t = i / (sampleCount - 1);
@@ -309,7 +305,6 @@ export function drawFunction1D(
     const yValue = fn(xValue);
 
     if (!Number.isFinite(yValue)) {
-      finalizeSegment();
       continue;
     }
 
@@ -317,18 +312,35 @@ export function drawFunction1D(
     const canvasY = yScale(yValue);
 
     if (!Number.isFinite(canvasX) || !Number.isFinite(canvasY)) {
-      finalizeSegment();
       continue;
     }
 
-    if (!drawing) {
-      ctx.beginPath();
-      ctx.moveTo(canvasX, canvasY);
-      drawing = true;
-    } else {
-      ctx.lineTo(canvasX, canvasY);
-    }
+    points.push({ x: canvasX, y: canvasY });
   }
 
-  finalizeSegment();
+  if (points.length < 2) {
+    return;
+  }
+
+  // Draw fill first if specified
+  if (fill !== undefined) {
+    ctx.beginPath();
+    const baselineY = yScale(0);
+    ctx.moveTo(points[0].x, baselineY);
+    for (const point of points) {
+      ctx.lineTo(point.x, point.y);
+    }
+    ctx.lineTo(points[points.length - 1].x, baselineY);
+    ctx.closePath();
+    ctx.fillStyle = fill;
+    ctx.fill();
+  }
+
+  // Draw stroke on top (only the function line)
+  ctx.beginPath();
+  ctx.moveTo(points[0].x, points[0].y);
+  for (let i = 1; i < points.length; i++) {
+    ctx.lineTo(points[i].x, points[i].y);
+  }
+  ctx.stroke();
 }
