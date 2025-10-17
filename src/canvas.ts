@@ -204,14 +204,21 @@ export function addFrameUsingScales(
   addVerticalLine(ctx, 'black', xScale.range[1], [yScale.range[0], yScale.range[1]]);
 }
 
+export interface DrawScatterOptions {
+  radius?: number;
+  alpha?: number;
+}
+
 export function drawScatter(
   scatterCtx: CanvasRenderingContext2D,
   xScale: Scale,
   yScale: Scale,
   coords: Pair<number>[],
   colors: string[],
-  highlightIndex?: number
+  highlightIndex?: number,
+  options: DrawScatterOptions = {}
 ): void {
+  const { radius = 3, alpha = 1.0 } = options;
 
   for (let i = 0; i < coords.length; i++) {
     const pair = coords[i];
@@ -224,9 +231,11 @@ export function drawScatter(
     }
     const [x, y] = pair;
     scatterCtx.beginPath();
-    scatterCtx.arc(xScale(x), yScale(y), 3, 0, 2 * Math.PI);
+    scatterCtx.arc(xScale(x), yScale(y), radius, 0, 2 * Math.PI);
+    scatterCtx.globalAlpha = alpha;
     scatterCtx.fillStyle = color;
     scatterCtx.fill();
+    scatterCtx.globalAlpha = 1.0;
   }
 
   if (highlightIndex !== undefined) {
