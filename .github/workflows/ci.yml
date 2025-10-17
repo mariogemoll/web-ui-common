@@ -20,3 +20,6 @@ jobs:
 
     - name: Run TypeScript compilation
       run: npx tsc
+
+    - name: Run tests
+      run: npx vitest run
