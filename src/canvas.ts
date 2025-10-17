@@ -272,39 +272,37 @@ export function writePixelValues(
   }
 }
 
-export function drawFunction1D(
+export interface DrawLineOptions {
+  stroke?: string;
+  lineWidth?: number;
+  fill?: string;
+}
+
+export function drawLine(
   ctx: CanvasRenderingContext2D,
   xScale: Scale,
   yScale: Scale,
-  fn: (x: number) => number,
-  options: DrawFunction1DOptions = {}
+  dataPoints: Pair<number>[],
+  options: DrawLineOptions = {}
 ): void {
   const {
     stroke = 'steelblue',
     lineWidth = 1.5,
-    sampleCount = Math.max(2, Math.floor(Math.abs(xScale.range[1] - xScale.range[0]))),
     fill
   } = options;
 
-  if (sampleCount < 2) {
+  if (dataPoints.length < 2) {
     return;
   }
-
-  const [domainStart, domainEnd] = xScale.domain;
-  const totalRange = domainEnd - domainStart;
 
   ctx.strokeStyle = stroke;
   ctx.lineWidth = lineWidth;
 
-  // Collect all points first
+  // Convert data points to canvas coordinates
   const points: Array<{ x: number; y: number }> = [];
 
-  for (let i = 0; i < sampleCount; i++) {
-    const t = i / (sampleCount - 1);
-    const xValue = domainStart + t * totalRange;
-    const yValue = fn(xValue);
-
-    if (!Number.isFinite(yValue)) {
+  for (const [xValue, yValue] of dataPoints) {
+    if (!Number.isFinite(xValue) || !Number.isFinite(yValue)) {
       continue;
     }
 
@@ -336,11 +334,45 @@ export function drawFunction1D(
     ctx.fill();
   }
 
-  // Draw stroke on top (only the function line)
+  // Draw stroke on top (only the line)
   ctx.beginPath();
   ctx.moveTo(points[0].x, points[0].y);
   for (let i = 1; i < points.length; i++) {
     ctx.lineTo(points[i].x, points[i].y);
   }
   ctx.stroke();
+}
+
+export function drawFunction1D(
+  ctx: CanvasRenderingContext2D,
+  xScale: Scale,
+  yScale: Scale,
+  fn: (x: number) => number,
+  options: DrawFunction1DOptions = {}
+): void {
+  const {
+    stroke = 'steelblue',
+    lineWidth = 1.5,
+    sampleCount = Math.max(2, Math.floor(Math.abs(xScale.range[1] - xScale.range[0]))),
+    fill
+  } = options;
+
+  if (sampleCount < 2) {
+    return;
+  }
+
+  const [domainStart, domainEnd] = xScale.domain;
+  const totalRange = domainEnd - domainStart;
+
+  // Generate data points from function
+  const dataPoints: Pair<number>[] = [];
+  for (let i = 0; i < sampleCount; i++) {
+    const t = i / (sampleCount - 1);
+    const xValue = domainStart + t * totalRange;
+    const yValue = fn(xValue);
+    dataPoints.push([xValue, yValue]);
+  }
+
+  // Use drawLine to render
+  drawLine(ctx, xScale, yScale, dataPoints, { stroke, lineWidth, fill });
 }
