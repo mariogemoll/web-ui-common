@@ -324,11 +324,16 @@ export function drawLine(
   if (fill !== undefined) {
     ctx.beginPath();
     const baselineY = yScale(0);
-    ctx.moveTo(points[0].x, baselineY);
+    const firstPoint = points[0];
+    const lastPoint = points[points.length - 1];
+    if (!firstPoint || !lastPoint) {
+      return;
+    }
+    ctx.moveTo(firstPoint.x, baselineY);
     for (const point of points) {
       ctx.lineTo(point.x, point.y);
     }
-    ctx.lineTo(points[points.length - 1].x, baselineY);
+    ctx.lineTo(lastPoint.x, baselineY);
     ctx.closePath();
     ctx.fillStyle = fill;
     ctx.fill();
@@ -336,9 +341,17 @@ export function drawLine(
 
   // Draw stroke on top (only the line)
   ctx.beginPath();
-  ctx.moveTo(points[0].x, points[0].y);
+  const firstPoint = points[0];
+  if (!firstPoint) {
+    return;
+  }
+  ctx.moveTo(firstPoint.x, firstPoint.y);
   for (let i = 1; i < points.length; i++) {
-    ctx.lineTo(points[i].x, points[i].y);
+    const point = points[i];
+    if (!point) {
+      continue;
+    }
+    ctx.lineTo(point.x, point.y);
   }
   ctx.stroke();
 }
@@ -374,5 +387,9 @@ export function drawFunction1D(
   }
 
   // Use drawLine to render
-  drawLine(ctx, xScale, yScale, dataPoints, { stroke, lineWidth, fill });
+  const lineOptions: DrawLineOptions = { stroke, lineWidth };
+  if (fill !== undefined) {
+    lineOptions.fill = fill;
+  }
+  drawLine(ctx, xScale, yScale, dataPoints, lineOptions);
 }

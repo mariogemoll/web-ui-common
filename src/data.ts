@@ -15,6 +15,9 @@ export function quantizeFloats(data: Float32Array): ArrayBuffer {
   let maxVal = -Infinity;
   for (let i = 0; i < data.length; i++) {
     const val = data[i];
+    if (val === undefined) {
+      throw new Error(`quantizeFloats: data[${i}] is undefined`);
+    }
     if (val < minVal) minVal = val;
     if (val > maxVal) maxVal = val;
   }
@@ -35,7 +38,11 @@ export function quantizeFloats(data: Float32Array): ArrayBuffer {
     quantizedView.fill(0);
   } else {
     for (let i = 0; i < data.length; i++) {
-      const normalized = (data[i] - minVal) / extent; // 0 to 1
+      const val = data[i];
+      if (val === undefined) {
+        throw new Error(`quantizeFloats: data[${i}] is undefined`);
+      }
+      const normalized = (val - minVal) / extent; // 0 to 1
       const quantized = Math.round(normalized * 255); // 0 to 255
       quantizedView[i] = quantized;
     }
@@ -65,7 +72,11 @@ export function dequantizeFloats(buf: ArrayBuffer): [number, number, Float32Arra
 
   const gridData = new Float32Array(gridUint8.length);
   for (let i = 0; i < gridUint8.length; i++) {
-    gridData[i] = convert(gridUint8[i]);
+    const val = gridUint8[i];
+    if (val === undefined) {
+      throw new Error(`dequantizeFloats: gridUint8[${i}] is undefined`);
+    }
+    gridData[i] = convert(val);
   }
 
   return [minVal, maxVal, gridData];
