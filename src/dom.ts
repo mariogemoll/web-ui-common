@@ -6,3 +6,9 @@ export function el(parent: Document | Element, query: string): Element {
   return element;
 }
 
+export function removePlaceholder(container: HTMLElement): void {
+  const placeholder = container.querySelector('.placeholder');
+  if (placeholder !== null) {
+    placeholder.remove();
+  }
+}
