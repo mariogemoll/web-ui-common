@@ -37,7 +37,7 @@ export function addHorizontalLine(
   ctx.beginPath();
   const adjustedY = y + 0.5; // Adjust for crisp edges
   ctx.moveTo(x1, adjustedY);
-  ctx.lineTo(x2, adjustedY);
+  ctx.lineTo(x2 + 0.5, adjustedY);
   ctx.stroke();
 }
 
