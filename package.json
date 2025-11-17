@@ -2,6 +2,14 @@
   "name": "web-ui-common",
   "version": "0.1.0",
   "type": "module",
+  "exports": {
+    "./canvas": "./src/canvas.ts",
+    "./dom": "./src/dom.ts",
+    "./util": "./src/util.ts",
+    "./types": "./src/types.ts",
+    "./data": "./src/data.ts",
+    "./state": "./src/state.ts"
+  },
   "devDependencies": {
     "@vitest/ui": "^2.1.8",
     "esbuild": "^0.27.0",
