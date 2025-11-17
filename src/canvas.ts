@@ -424,11 +424,9 @@ export function createMovableDot(
   const { radius = 8, fill = 'red', onChange } = options;
 
   let isDragging = false;
-  let currentPosition = initialPosition;
 
   // Render function that draws the dot at a given position
   const render = (position: Pair<number>): void => {
-    currentPosition = position;
     const [x, y] = position;
     const screenX = xScale(x);
     const screenY = yScale(y);
@@ -463,27 +461,17 @@ export function createMovableDot(
     return [dataX, dataY];
   }
 
-  // Helper to check if click is near dot
-  function isNearDot(clickX: number, clickY: number, position: Pair<number>): boolean {
-    const [dotX, dotY] = position;
-    const screenX = xScale(dotX);
-    const screenY = yScale(dotY);
-    const distance = Math.sqrt(
-      Math.pow(screenX - xScale(clickX), 2) + Math.pow(screenY - yScale(clickY), 2)
-    );
-    return distance <= radius * 2;
-  }
-
   // Mouse events
   canvas.addEventListener('mousedown', (e: MouseEvent) => {
     const coords = getCoords(e);
     if (!coords) {return;}
 
-    const [x, y] = coords;
-    if (isNearDot(x, y, currentPosition)) {
-      isDragging = true;
-      e.preventDefault();
+    // Set position and start dragging on any click
+    isDragging = true;
+    if (onChange) {
+      onChange(coords);
     }
+    e.preventDefault();
   });
 
   canvas.addEventListener('mousemove', (e: MouseEvent) => {
@@ -511,11 +499,12 @@ export function createMovableDot(
     const coords = getCoords(e);
     if (!coords) {return;}
 
-    const [x, y] = coords;
-    if (isNearDot(x, y, currentPosition)) {
-      isDragging = true;
-      e.preventDefault();
+    // Set position and start dragging on any touch
+    isDragging = true;
+    if (onChange) {
+      onChange(coords);
     }
+    e.preventDefault();
   });
 
   canvas.addEventListener('touchmove', (e: TouchEvent) => {
