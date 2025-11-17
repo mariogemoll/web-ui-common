@@ -308,7 +308,7 @@ export function drawLine(
   ctx.lineWidth = lineWidth;
 
   // Convert data points to canvas coordinates
-  const points: Array<{ x: number; y: number }> = [];
+  const points: { x: number; y: number }[] = [];
 
   for (const [xValue, yValue] of dataPoints) {
     if (!Number.isFinite(xValue) || !Number.isFinite(yValue)) {

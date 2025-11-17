@@ -18,8 +18,8 @@ export function quantizeFloats(data: Float32Array): ArrayBuffer {
     if (val === undefined) {
       throw new Error(`quantizeFloats: data[${i}] is undefined`);
     }
-    if (val < minVal) minVal = val;
-    if (val > maxVal) maxVal = val;
+    if (val < minVal) {minVal = val;}
+    if (val > maxVal) {maxVal = val;}
   }
 
   // Create output buffer: 8 bytes header + 1 byte per value

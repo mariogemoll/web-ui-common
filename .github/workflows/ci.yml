@@ -18,6 +18,12 @@ jobs:
     - name: Install dependencies
       run: npm i
 
+    - name: "ESLint the ESLint config"
+      run: npx eslint -c basic.eslint.config.js basic.eslint.config.js eslint.config.js
+
+    - name: "ESLint"
+      run: npx eslint src
+
     - name: Run TypeScript compilation
       run: npx tsc
 

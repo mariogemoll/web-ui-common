@@ -4,7 +4,11 @@
   "type": "module",
   "devDependencies": {
     "@vitest/ui": "^2.1.8",
-    "typescript": "^5.7.2",
+    "esbuild": "^0.27.0",
+    "eslint": "^9.39.1",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.4",
     "vitest": "^2.1.8"
   }
 }
