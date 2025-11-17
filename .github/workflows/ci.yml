@@ -29,3 +29,6 @@ jobs:
 
     - name: Run tests
       run: npx vitest run
+
+    - name: Build demo bundle
+      run: npx esbuild --bundle --outdir=dist --format=esm src/demo.ts
