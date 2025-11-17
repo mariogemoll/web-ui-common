@@ -1,5 +1,6 @@
 import {
   addFrameUsingScales,
+  createMovableDot,
   drawFunction1D,
   drawLine,
   drawScatter,
@@ -8,7 +9,7 @@ import { addCanvas, el } from './dom';
 import type { Pair } from './types';
 import { makeScale } from './util';
 
-// Demo 1: Line Chart
+// Demo 1: Line chart
 function createLineChart(): void {
   const container = el(document, '#line-chart-container') as HTMLElement;
   const canvas = addCanvas(container, { width: '800', height: '400' });
@@ -44,7 +45,7 @@ function createLineChart(): void {
   });
 }
 
-// Demo 2: Scatter Plot
+// Demo 2: Scatter plot
 function createScatterPlot(): void {
   const container = el(document, '#scatter-plot-container') as HTMLElement;
   const canvas = addCanvas(container, { width: '800', height: '400' });
@@ -78,7 +79,7 @@ function createScatterPlot(): void {
   });
 }
 
-// Demo 3: Function Plotting
+// Demo 3: Function plotting
 function createFunctionPlot(): void {
   const container = el(document, '#function-plot-container') as HTMLElement;
   const canvas = addCanvas(container, { width: '800', height: '400' });
@@ -122,11 +123,69 @@ function createFunctionPlot(): void {
   plotFunction(Math.sin, 'crimson', 'y = sin(x)');
 }
 
+// Demo 4: Synced movable dots
+function createSyncedDots(): void {
+  const container = el(document, '#synced-dots-container') as HTMLElement;
+
+  // Create first canvas
+  const canvas1 = addCanvas(container, { width: '400', height: '400' });
+  const ctx1 = getContext(canvas1);
+
+  // Create second canvas
+  const canvas2 = addCanvas(container, { width: '400', height: '400' });
+  const ctx2 = getContext(canvas2);
+
+  // Create scales (shared by both canvases)
+  const xScale = makeScale([0, 10], [40, 360]);
+  const yScale = makeScale([0, 10], [360, 40]);
+
+  // Redraw function that draws both canvases
+  const redrawAll = (position: Pair<number>): void => {
+    // Clear both canvases
+    ctx1.clearRect(0, 0, canvas1.width, canvas1.height);
+    ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
+
+    // Draw frames
+    addFrameUsingScales(ctx1, xScale, yScale, 6);
+    addFrameUsingScales(ctx2, xScale, yScale, 6);
+
+    // Draw dots
+    dot1.render(position);
+    dot2.render(position);
+  };
+
+  // Create movable dots with onChange callbacks that redraw both
+  const dot1 = createMovableDot(canvas1, ctx1, xScale, yScale, [5, 5], {
+    radius: 8,
+    fill: 'steelblue',
+    onChange: redrawAll
+  });
+
+  const dot2 = createMovableDot(canvas2, ctx2, xScale, yScale, [5, 5], {
+    radius: 8,
+    fill: 'crimson',
+    onChange: redrawAll
+  });
+
+  // Initial draw
+  addFrameUsingScales(ctx1, xScale, yScale, 6);
+  addFrameUsingScales(ctx2, xScale, yScale, 6);
+
+  // Add info text
+  const info = document.createElement('p');
+  info.textContent = 'Drag the dot on either canvas - both will stay synchronized!';
+  info.style.marginTop = '10px';
+  info.style.color = '#666';
+  info.style.fontStyle = 'italic';
+  container.appendChild(info);
+}
+
 // Initialize all demos
 function init(): void {
   createLineChart();
   createScatterPlot();
   createFunctionPlot();
+  createSyncedDots();
 }
 
 // Run when DOM is loaded

@@ -402,3 +402,144 @@ export function drawFunction1D(
   }
   drawLine(ctx, xScale, yScale, dataPoints, lineOptions);
 }
+
+export interface MovableDotOptions {
+  radius?: number;
+  fill?: string;
+  onChange?: (position: Pair<number>) => void;
+}
+
+export interface MovableDotRenderer {
+  render: (position: Pair<number>) => void;
+}
+
+export function createMovableDot(
+  canvas: HTMLCanvasElement,
+  ctx: CanvasRenderingContext2D,
+  xScale: Scale,
+  yScale: Scale,
+  initialPosition: Pair<number>,
+  options: MovableDotOptions = {}
+): MovableDotRenderer {
+  const { radius = 8, fill = 'red', onChange } = options;
+
+  let isDragging = false;
+  let currentPosition = initialPosition;
+
+  // Render function that draws the dot at a given position
+  const render = (position: Pair<number>): void => {
+    currentPosition = position;
+    const [x, y] = position;
+    const screenX = xScale(x);
+    const screenY = yScale(y);
+    addDot(ctx, screenX, screenY, radius, fill);
+  };
+
+  // Helper to get coordinates from event
+  function getCoords(event: MouseEvent | TouchEvent): Pair<number> | null {
+    const rect = canvas.getBoundingClientRect();
+    let clientX: number;
+    let clientY: number;
+
+    if (event instanceof MouseEvent) {
+      clientX = event.clientX;
+      clientY = event.clientY;
+    } else if (event instanceof TouchEvent && event.touches.length > 0) {
+      const touch = event.touches[0];
+      if (!touch) {return null;}
+      clientX = touch.clientX;
+      clientY = touch.clientY;
+    } else {
+      return null;
+    }
+
+    const screenX = clientX - rect.left;
+    const screenY = clientY - rect.top;
+
+    // Convert screen coordinates to data coordinates
+    const dataX = xScale.inverse(screenX);
+    const dataY = yScale.inverse(screenY);
+
+    return [dataX, dataY];
+  }
+
+  // Helper to check if click is near dot
+  function isNearDot(clickX: number, clickY: number, position: Pair<number>): boolean {
+    const [dotX, dotY] = position;
+    const screenX = xScale(dotX);
+    const screenY = yScale(dotY);
+    const distance = Math.sqrt(
+      Math.pow(screenX - xScale(clickX), 2) + Math.pow(screenY - yScale(clickY), 2)
+    );
+    return distance <= radius * 2;
+  }
+
+  // Mouse events
+  canvas.addEventListener('mousedown', (e: MouseEvent) => {
+    const coords = getCoords(e);
+    if (!coords) {return;}
+
+    const [x, y] = coords;
+    if (isNearDot(x, y, currentPosition)) {
+      isDragging = true;
+      e.preventDefault();
+    }
+  });
+
+  canvas.addEventListener('mousemove', (e: MouseEvent) => {
+    if (!isDragging) {return;}
+
+    const coords = getCoords(e);
+    if (!coords) {return;}
+
+    if (onChange) {
+      onChange(coords);
+    }
+    e.preventDefault();
+  });
+
+  canvas.addEventListener('mouseup', () => {
+    isDragging = false;
+  });
+
+  canvas.addEventListener('mouseleave', () => {
+    isDragging = false;
+  });
+
+  // Touch events
+  canvas.addEventListener('touchstart', (e: TouchEvent) => {
+    const coords = getCoords(e);
+    if (!coords) {return;}
+
+    const [x, y] = coords;
+    if (isNearDot(x, y, currentPosition)) {
+      isDragging = true;
+      e.preventDefault();
+    }
+  });
+
+  canvas.addEventListener('touchmove', (e: TouchEvent) => {
+    if (!isDragging) {return;}
+
+    const coords = getCoords(e);
+    if (!coords) {return;}
+
+    if (onChange) {
+      onChange(coords);
+    }
+    e.preventDefault();
+  });
+
+  canvas.addEventListener('touchend', () => {
+    isDragging = false;
+  });
+
+  canvas.addEventListener('touchcancel', () => {
+    isDragging = false;
+  });
+
+  // Initial render
+  render(initialPosition);
+
+  return { render };
+}
