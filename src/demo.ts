@@ -1,4 +1,5 @@
 import {
+  addAxesThroughOrigin,
   addFrameUsingScales,
   addGridLines,
   createMovableDot,
@@ -130,7 +131,53 @@ function createFunctionPlot(): void {
   plotFunction(Math.sin, 'crimson', 'y = sin(x)');
 }
 
-// Demo 4: Synced movable dots
+// Demo 4: Centered coordinate system with origin axes
+function createCenteredPlot(): void {
+  const container = el(document, '#centered-plot-container') as HTMLElement;
+  const canvas = addCanvas(container, { width: '800', height: '400' });
+  const ctx = getContext(canvas);
+
+  // Create scales with origin at center (negative to positive values)
+  const xScale = makeScale([-5, 5], [60, 740]);
+  const yScale = makeScale([-3, 3], [340, 60]);
+
+  // Draw grid lines first
+  addGridLines(ctx, xScale, yScale, 6);
+
+  // Draw frame with axes
+  addFrameUsingScales(ctx, xScale, yScale, 6);
+
+  addAxesThroughOrigin(ctx, xScale, yScale, {
+    showTicks: true,
+    showLabels: false,
+    numTicks: 6,
+    color: 'black',
+    lineWidth: 1.5
+  });
+
+  // Plot a circle around the origin
+  const circleRadius = 2;
+  const circlePoints: Pair<number>[] = [];
+  for (let i = 0; i <= 100; i++) {
+    const angle = (i / 100) * 2 * Math.PI;
+    const x = circleRadius * Math.cos(angle);
+    const y = circleRadius * Math.sin(angle);
+    circlePoints.push([x, y]);
+  }
+
+  drawLine(ctx, xScale, yScale, circlePoints, {
+    stroke: 'crimson',
+    lineWidth: 2
+  });
+
+  // Plot a parabola y = x²/2 - 2
+  drawFunction1D(ctx, xScale, yScale, (x) => (x * x) / 2 - 2, {
+    stroke: 'darkgreen',
+    lineWidth: 2
+  });
+}
+
+// Demo 5: Synced movable dots
 function createSyncedDots(): void {
   const container = el(document, '#synced-dots-container') as HTMLElement;
 
@@ -192,6 +239,7 @@ function init(): void {
   createLineChart();
   createScatterPlot();
   createFunctionPlot();
+  createCenteredPlot();
   createSyncedDots();
 }
 

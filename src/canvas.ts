@@ -194,6 +194,75 @@ export function addGridLines(
   });
 }
 
+export interface AxesThroughOriginOptions {
+  showTicks?: boolean;
+  showLabels?: boolean;
+  numTicks?: number;
+  color?: string;
+  lineWidth?: number;
+}
+
+export function addAxesThroughOrigin(
+  ctx: CanvasRenderingContext2D,
+  xScale: Scale,
+  yScale: Scale,
+  options: AxesThroughOriginOptions = {}
+): void {
+  const {
+    showTicks = false,
+    showLabels = false,
+    numTicks = 6,
+    color = 'black',
+    lineWidth = 1
+  } = options;
+
+  // Calculate origin position in canvas coordinates
+  const originX = xScale(0);
+  const originY = yScale(0);
+
+  ctx.strokeStyle = color;
+  ctx.lineWidth = lineWidth;
+
+  // Draw horizontal axis through origin (y = 0)
+  addHorizontalLine(ctx, color, [xScale.range[0], xScale.range[1]], originY);
+
+  // Draw vertical axis through origin (x = 0)
+  addVerticalLine(ctx, color, originX, [yScale.range[0], yScale.range[1]]);
+
+  if (showTicks || showLabels) {
+    const xTicks = generateTicks(xScale.domain, numTicks);
+    const yTicks = generateTicks(yScale.domain, numTicks);
+
+    // X-axis ticks and labels
+    xTicks.forEach((tickValue: number) => {
+      if (tickValue === 0) {
+        return; // Skip origin
+      }
+      const x = xScale(tickValue);
+      if (showTicks) {
+        addVerticalLine(ctx, color, x, [originY - 3, originY + 3]);
+      }
+      if (showLabels) {
+        addText(ctx, 'middle', x, originY + 15, tickValue.toFixed(1), 10, 'sans-serif', color);
+      }
+    });
+
+    // Y-axis ticks and labels
+    yTicks.forEach((tickValue: number) => {
+      if (tickValue === 0) {
+        return; // Skip origin
+      }
+      const y = yScale(tickValue);
+      if (showTicks) {
+        addHorizontalLine(ctx, color, [originX - 3, originX + 3], y);
+      }
+      if (showLabels) {
+        addText(ctx, 'end', originX - 6, y, tickValue.toFixed(1), 10, 'sans-serif', color);
+      }
+    });
+  }
+}
+
 export function addFrameUsingScales(
   ctx: CanvasRenderingContext2D,
   xScale: Scale,
