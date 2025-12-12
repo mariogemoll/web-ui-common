@@ -171,13 +171,35 @@ export function addFrame(
   addVerticalLine(ctx, 'black', width - margins.right, [margins.top, height - margins.bottom]);
 }
 
+export function addGridLines(
+  ctx: CanvasRenderingContext2D,
+  xScale: Scale,
+  yScale: Scale,
+  numTicks: number,
+  color = '#e0e0e0'
+): void {
+  const xTicks = generateTicks(xScale.domain, numTicks);
+  const yTicks = generateTicks(yScale.domain, numTicks);
+
+  // Vertical grid lines
+  xTicks.forEach((tickValue: number) => {
+    const x = xScale(tickValue);
+    addVerticalLine(ctx, color, x, [yScale.range[1], yScale.range[0]]);
+  });
+
+  // Horizontal grid lines
+  yTicks.forEach((tickValue: number) => {
+    const y = yScale(tickValue);
+    addHorizontalLine(ctx, color, [xScale.range[0], xScale.range[1]], y);
+  });
+}
+
 export function addFrameUsingScales(
   ctx: CanvasRenderingContext2D,
   xScale: Scale,
   yScale: Scale,
   numTicks: number
 ): void {
-
   // x axis
   addHorizontalLine(ctx, 'black', [xScale.range[0], xScale.range[1]], yScale.range[0]);
   const xTicks = generateTicks(xScale.domain, numTicks);
@@ -192,7 +214,6 @@ export function addFrameUsingScales(
   const yTicks = generateTicks(yScale.domain, numTicks);
   yTicks.forEach((tickValue: number) => {
     const y = yScale(tickValue);
-    addHorizontalLine(ctx, 'black', [xScale.range[0] - 6, xScale.range[0]], y);
     addHorizontalLine(ctx, 'black', [xScale.range[0] - 6, xScale.range[0]], y);
     addText(ctx, 'end', xScale.range[0] - 9, y + 3, tickValue.toFixed(1));
   });

@@ -1,5 +1,6 @@
 import {
   addFrameUsingScales,
+  addGridLines,
   createMovableDot,
   drawFunction1D,
   drawLine,
@@ -18,6 +19,9 @@ function createLineChart(): void {
   // Create scales
   const xScale = makeScale([0, 10], [60, 740]);
   const yScale = makeScale([0, 100], [340, 60]);
+
+  // Draw grid lines first (so they appear behind the data)
+  addGridLines(ctx, xScale, yScale, 6);
 
   // Draw frame with axes
   addFrameUsingScales(ctx, xScale, yScale, 6);
@@ -93,6 +97,9 @@ function createFunctionPlot(): void {
     // Create scales
     const xScale = makeScale([-2 * Math.PI, 2 * Math.PI], [60, 740]);
     const yScale = makeScale([-1.5, 1.5], [340, 60]);
+
+    // Draw grid lines first
+    addGridLines(ctx, xScale, yScale, 7);
 
     // Draw frame with axes
     addFrameUsingScales(ctx, xScale, yScale, 7);
