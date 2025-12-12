@@ -263,6 +263,66 @@ export function addAxesThroughOrigin(
   }
 }
 
+export function setClippingRegion(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number
+): void {
+  ctx.beginPath();
+  ctx.rect(x, y, width, height);
+  ctx.clip();
+}
+
+export function withClippingRegion<T>(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  drawFn: () => T
+): T {
+  ctx.save();
+  setClippingRegion(ctx, x, y, width, height);
+  const result = drawFn();
+  ctx.restore();
+  return result;
+}
+
+export function setClippingRegionFromMargins(
+  ctx: CanvasRenderingContext2D,
+  canvas: HTMLCanvasElement,
+  margins: Margins
+): void {
+  const x = margins.left;
+  const y = margins.top;
+  const width = canvas.width - margins.left - margins.right;
+  const height = canvas.height - margins.top - margins.bottom;
+  setClippingRegion(ctx, x, y, width, height);
+}
+
+export function setClippingRegionFromScales(
+  ctx: CanvasRenderingContext2D,
+  xScale: Scale,
+  yScale: Scale
+): void {
+  const [xMin, xMax] = xScale.range;
+  const [yMax, yMin] = yScale.range; // Note: yScale is inverted (yMax is smaller pixel value)
+  setClippingRegion(ctx, xMin, yMin, xMax - xMin, yMax - yMin);
+}
+
+export function withClippingRegionFromScales<T>(
+  ctx: CanvasRenderingContext2D,
+  xScale: Scale,
+  yScale: Scale,
+  drawFn: () => T
+): T {
+  const [xMin, xMax] = xScale.range;
+  const [yMax, yMin] = yScale.range;
+  return withClippingRegion(ctx, xMin, yMin, xMax - xMin, yMax - yMin, drawFn);
+}
+
 export function addFrameUsingScales(
   ctx: CanvasRenderingContext2D,
   xScale: Scale,

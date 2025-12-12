@@ -6,7 +6,8 @@ import {
   drawFunction1D,
   drawLine,
   drawScatter,
-  getContext } from './canvas';
+  getContext,
+  withClippingRegionFromScales } from './canvas';
 import { addCanvas, el } from './dom';
 import type { Pair } from './types';
 import { makeScale } from './util';
@@ -155,25 +156,28 @@ function createCenteredPlot(): void {
     lineWidth: 1.5
   });
 
-  // Plot a circle around the origin
-  const circleRadius = 2;
-  const circlePoints: Pair<number>[] = [];
-  for (let i = 0; i <= 100; i++) {
-    const angle = (i / 100) * 2 * Math.PI;
-    const x = circleRadius * Math.cos(angle);
-    const y = circleRadius * Math.sin(angle);
-    circlePoints.push([x, y]);
-  }
+  // Use clipping to prevent drawing outside the frame
+  withClippingRegionFromScales(ctx, xScale, yScale, () => {
+    // Plot a circle around the origin
+    const circleRadius = 2;
+    const circlePoints: Pair<number>[] = [];
+    for (let i = 0; i <= 100; i++) {
+      const angle = (i / 100) * 2 * Math.PI;
+      const x = circleRadius * Math.cos(angle);
+      const y = circleRadius * Math.sin(angle);
+      circlePoints.push([x, y]);
+    }
 
-  drawLine(ctx, xScale, yScale, circlePoints, {
-    stroke: 'crimson',
-    lineWidth: 2
-  });
+    drawLine(ctx, xScale, yScale, circlePoints, {
+      stroke: 'crimson',
+      lineWidth: 2
+    });
 
-  // Plot a parabola y = x²/2 - 2
-  drawFunction1D(ctx, xScale, yScale, (x) => (x * x) / 2 - 2, {
-    stroke: 'darkgreen',
-    lineWidth: 2
+    // Plot a parabola y = x²/2 - 2
+    drawFunction1D(ctx, xScale, yScale, (x) => (x * x) / 2 - 2, {
+      stroke: 'darkgreen',
+      lineWidth: 2
+    });
   });
 }
 
