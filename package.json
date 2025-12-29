@@ -8,7 +8,8 @@
     "./util": "./src/util.ts",
     "./types": "./src/types.ts",
     "./data": "./src/data.ts",
-    "./state": "./src/state.ts"
+    "./state": "./src/state.ts",
+    "./webgl": "./src/webgl.ts"
   },
   "devDependencies": {
     "@vitest/ui": "^2.1.8",
