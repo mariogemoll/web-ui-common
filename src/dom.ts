@@ -35,6 +35,25 @@ export function addEl(
   return el;
 }
 
+export function removePlaceholder(container: HTMLElement): void {
+  const placeholder = container.querySelector('.placeholder');
+  if (placeholder !== null) {
+    placeholder.remove();
+  }
+}
+
+// make* functions (alphabetical)
+
+export const makeCanvas: HTMLElementGenerator<HTMLCanvasElement> = (attrs = {}, style = {}) => (
+  makeEl('canvas', attrs, style) as HTMLCanvasElement
+);
+
+// add* functions (alphabetical)
+
+export const addCanvas: HTMLElementAdder<HTMLCanvasElement> = (parent, attrs = {}, style = {}) => (
+  addEl(parent, 'canvas', attrs, style) as HTMLCanvasElement
+);
+
 export const addDiv: HTMLElementAdder<HTMLDivElement> = (parent, attrs = {}, style = {}) => (
   addEl(parent, 'div', attrs, style) as HTMLDivElement
 );
@@ -43,21 +62,6 @@ export const addSpan: HTMLElementAdder<HTMLSpanElement> = (parent, attrs = {}, s
   addEl(parent, 'span', attrs, style) as HTMLSpanElement
 );
 
-export const makeCanvas: HTMLElementGenerator<HTMLCanvasElement> = (attrs = {}, style = {}) => (
-  makeEl('canvas', attrs, style) as HTMLCanvasElement
-);
-
-export const addCanvas: HTMLElementAdder<HTMLCanvasElement> = (parent, attrs = {}, style = {}) => (
-  addEl(parent, 'canvas', attrs, style) as HTMLCanvasElement
-);
-
 export const addTd: HTMLElementAdder<HTMLTableCellElement> = (parent, attrs = {}, style = {}) => (
   addEl(parent, 'td', attrs, style) as HTMLTableCellElement
 );
-
-export function removePlaceholder(container: HTMLElement): void {
-  const placeholder = container.querySelector('.placeholder');
-  if (placeholder !== null) {
-    placeholder.remove();
-  }
-}
