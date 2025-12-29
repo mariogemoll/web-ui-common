@@ -42,13 +42,57 @@ export function removePlaceholder(container: HTMLElement): void {
   }
 }
 
+export function addText(parent: HTMLElement, text: string): Text {
+  const textNode = document.createTextNode(text);
+  parent.appendChild(textNode);
+  return textNode;
+}
+
+export function addOption(
+  select: HTMLSelectElement, value: string, text: string
+): HTMLOptionElement {
+  const option = document.createElement('option');
+  option.value = value;
+  option.textContent = text;
+  select.appendChild(option);
+  return option;
+}
+
 // make* functions (alphabetical)
+
+export const makeButton: HTMLElementGenerator<HTMLButtonElement> = (attrs = {}, style = {}) => (
+  makeEl('button', attrs, style) as HTMLButtonElement
+);
 
 export const makeCanvas: HTMLElementGenerator<HTMLCanvasElement> = (attrs = {}, style = {}) => (
   makeEl('canvas', attrs, style) as HTMLCanvasElement
 );
 
+export const makeDiv: HTMLElementGenerator<HTMLDivElement> = (attrs = {}, style = {}) => (
+  makeEl('div', attrs, style) as HTMLDivElement
+);
+
+export const makeInput: HTMLElementGenerator<HTMLInputElement> = (attrs = {}, style = {}) => (
+  makeEl('input', attrs, style) as HTMLInputElement
+);
+
+export const makeLabel: HTMLElementGenerator<HTMLLabelElement> = (attrs = {}, style = {}) => (
+  makeEl('label', attrs, style) as HTMLLabelElement
+);
+
+export const makeSelect: HTMLElementGenerator<HTMLSelectElement> = (attrs = {}, style = {}) => (
+  makeEl('select', attrs, style) as HTMLSelectElement
+);
+
+export const makeSpan: HTMLElementGenerator<HTMLSpanElement> = (attrs = {}, style = {}) => (
+  makeEl('span', attrs, style) as HTMLSpanElement
+);
+
 // add* functions (alphabetical)
+
+export const addButton: HTMLElementAdder<HTMLButtonElement> = (parent, attrs = {}, style = {}) => (
+  addEl(parent, 'button', attrs, style) as HTMLButtonElement
+);
 
 export const addCanvas: HTMLElementAdder<HTMLCanvasElement> = (parent, attrs = {}, style = {}) => (
   addEl(parent, 'canvas', attrs, style) as HTMLCanvasElement
@@ -56,6 +100,18 @@ export const addCanvas: HTMLElementAdder<HTMLCanvasElement> = (parent, attrs = {
 
 export const addDiv: HTMLElementAdder<HTMLDivElement> = (parent, attrs = {}, style = {}) => (
   addEl(parent, 'div', attrs, style) as HTMLDivElement
+);
+
+export const addInput: HTMLElementAdder<HTMLInputElement> = (parent, attrs = {}, style = {}) => (
+  addEl(parent, 'input', attrs, style) as HTMLInputElement
+);
+
+export const addLabel: HTMLElementAdder<HTMLLabelElement> = (parent, attrs = {}, style = {}) => (
+  addEl(parent, 'label', attrs, style) as HTMLLabelElement
+);
+
+export const addSelect: HTMLElementAdder<HTMLSelectElement> = (parent, attrs = {}, style = {}) => (
+  addEl(parent, 'select', attrs, style) as HTMLSelectElement
 );
 
 export const addSpan: HTMLElementAdder<HTMLSpanElement> = (parent, attrs = {}, style = {}) => (
