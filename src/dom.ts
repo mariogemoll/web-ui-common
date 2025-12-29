@@ -1,8 +1,8 @@
 type HTMLElementGenerator<T> = (
-  attrs: Record<string, string>, style?: Partial<CSSStyleDeclaration>
+  attrs?: Record<string, string>, style?: Partial<CSSStyleDeclaration>
 ) => T;
 type HTMLElementAdder<T> = (
-  parent: HTMLElement, attrs: Record<string, string>, style?: Partial<CSSStyleDeclaration>
+  parent: HTMLElement, attrs?: Record<string, string>, style?: Partial<CSSStyleDeclaration>
 ) => T;
 
 export function el(parent: Document | Element, query: string): Element {
@@ -14,7 +14,7 @@ export function el(parent: Document | Element, query: string): Element {
 }
 
 export function makeEl(
-  tagName: string, attrs: Record<string, string>, style: Partial<CSSStyleDeclaration> = {}
+  tagName: string, attrs: Record<string, string> = {}, style: Partial<CSSStyleDeclaration> = {}
 ): HTMLElement {
   const el = document.createElement(tagName);
   for (const [key, value] of Object.entries(attrs)) {
@@ -27,7 +27,7 @@ export function makeEl(
 export function addEl(
   parent: HTMLElement,
   tagName: string,
-  attrs: Record<string, string>,
+  attrs: Record<string, string> = {},
   style: Partial<CSSStyleDeclaration> = {}
 ): HTMLElement {
   const el = makeEl(tagName, attrs, style);
@@ -35,23 +35,23 @@ export function addEl(
   return el;
 }
 
-export const addDiv: HTMLElementAdder<HTMLDivElement> = (parent, attrs, style = {}) => (
+export const addDiv: HTMLElementAdder<HTMLDivElement> = (parent, attrs = {}, style = {}) => (
   addEl(parent, 'div', attrs, style) as HTMLDivElement
 );
 
-export const addSpan: HTMLElementAdder<HTMLSpanElement> = (parent, attrs, style = {}) => (
+export const addSpan: HTMLElementAdder<HTMLSpanElement> = (parent, attrs = {}, style = {}) => (
   addEl(parent, 'span', attrs, style) as HTMLSpanElement
 );
 
-export const makeCanvas: HTMLElementGenerator<HTMLCanvasElement> = (attrs, style = {}) => (
+export const makeCanvas: HTMLElementGenerator<HTMLCanvasElement> = (attrs = {}, style = {}) => (
   makeEl('canvas', attrs, style) as HTMLCanvasElement
 );
 
-export const addCanvas: HTMLElementAdder<HTMLCanvasElement> = (parent, attrs, style = {}) => (
+export const addCanvas: HTMLElementAdder<HTMLCanvasElement> = (parent, attrs = {}, style = {}) => (
   addEl(parent, 'canvas', attrs, style) as HTMLCanvasElement
 );
 
-export const addTd: HTMLElementAdder<HTMLTableCellElement> = (parent, attrs, style = {}) => (
+export const addTd: HTMLElementAdder<HTMLTableCellElement> = (parent, attrs = {}, style = {}) => (
   addEl(parent, 'td', attrs, style) as HTMLTableCellElement
 );
 
